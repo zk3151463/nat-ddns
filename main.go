@@ -15,6 +15,9 @@ var (
 
 	s string
 	p string
+	u string
+	x int64
+	y int64
 )
 
 func init() {
@@ -22,7 +25,10 @@ func init() {
 	flag.BoolVar(&v, "v", false, "查看版本号")
 	flag.BoolVar(&V, "V", false, "查看版本信息及工具目录")
 	flag.StringVar(&s, "s", "client", "要使用的功能：client：客户端、server：服务端")
-	flag.StringVar(&p, "p", "9000", "服务的端口")
+	flag.StringVar(&p, "p", "./1.png", "路径")
+	flag.StringVar(&u, "u", "./1p.png", "路径")
+	flag.Int64Var(&x, "x", 1080, "宽")
+	flag.Int64Var(&y, "y", 3000, "高")
 
 	// 注意 `signal`。默认是 -s string，有了 `signal` 之后，变为 -s signal
 	// flag.StringVar(&s, "s", "", "send `signal` to a master process: stop, quit, reopen, reload")
@@ -38,7 +44,14 @@ func main() {
 	flag.Parse()
 
 	if len(p) >= 0 {
-		fmt.Println(p)
-		client.Setjieping(p)
+		if len(u) >= 0 {
+			fmt.Println("正在拍照")
+			client.Setjieping(p, u, x, y)
+			fmt.Println("拍照结束")
+		} else {
+			fmt.Println("请输入截图链接")
+			return
+		}
+
 	}
 }

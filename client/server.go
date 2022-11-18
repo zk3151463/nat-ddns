@@ -5,24 +5,39 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/chromedp/chromedp"
 	cdp "github.com/chromedp/chromedp"
+	"github.com/chromedp/chromedp/device"
 )
 
-func Setjieping() {
-	// 创建新的cdp上下文
-	ctx, cancel := cdp.NewContext(context.Background())
+func Setjieping(path, urlstr string, x, y int64) {
+	// create context
+	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
-	// 此处以360搜索首页为例
-	urlstr := `https://www.57xg.com`
-	var buf []byte
-	// 需要截图的元素，支持CSS selector以及XPath query
-	selector := `#main`
-	if err := cdp.Run(ctx, elementScreenshot(urlstr, selector, &buf)); err != nil {
+	// run
+	var b1, b2 []byte
+	if err := chromedp.Run(ctx,
+		// emulate iPhone 7 landscape
+		chromedp.Emulate(device.IPhone8Plus),
+		chromedp.Navigate(urlstr),
+		chromedp.CaptureScreenshot(&b1),
+
+		// reset
+		chromedp.Emulate(device.Reset),
+
+		// set really large viewport
+		chromedp.EmulateViewport(x, y),
+		chromedp.Navigate(urlstr),
+		chromedp.CaptureScreenshot(&b2),
+	); err != nil {
 		log.Fatal(err)
 	}
-	// 写入文件
-	if err := ioutil.WriteFile("360_so.png", buf, 0644); err != nil {
+
+	if err := ioutil.WriteFile("./jt/h5_"+path, b1, 0777); err != nil {
+		log.Fatal(err)
+	}
+	if err := ioutil.WriteFile("./jt/pc_"+path, b2, 0777); err != nil {
 		log.Fatal(err)
 	}
 }
